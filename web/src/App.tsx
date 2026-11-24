@@ -1,3 +1,4 @@
+// 演示 PR（AC1）：仅加注释，触发 web 作业，验证 PR 上两个作业均运行。
 import { Button, Table } from 'tdesign-react';
 import type { TableProps } from 'tdesign-react';
 import { formatCents } from './lib/format';
