@@ -5,7 +5,7 @@
 
 本地验证环境：Node v24.22.1、pnpm 10.34.9；CI 用 Node 24（见工作流）。Node 20 已于 2026-04-30 EOL，GitHub Actions 已于 2026-09-23 移除 Node 20 运行时，本仓已迁移至 Node 24（见下“Node 24 迁移记录”）；Node 20 的本地测试日志保留在 `evidence/node20-*.log`，作历史兼容证据（当时 web 与 miniprogram 全套步骤 10/10 通过，build 54.71s、主包 619.02 KB）。
 
-GPT 复核（2026-11-25，修改后 GO）已按七点改完：P0-1 changes 作业补 `pull-requests: read`；P0-2 触发路径加 `scripts/**`、过滤映射补两个检查脚本与工作流文件；P0-3 工作流文件改动触发两个作业（判定模拟 9/9 通过）；P1-1 README 删掉 `actions: write` 建议；P1-2 体积脚本只认 index.html 入口引用、边界测试 8/8 通过；P1-3 Node 20 实测通过（上）；P1-4 演示 PR 与截图待推仓后做（见“还剩什么”）。
+GPT 复核（2026-11-25，修改后 GO）已按七点改完：P0-1 changes 作业补 `pull-requests: read`；P0-2 触发路径加 `scripts/**`、过滤映射补两个检查脚本与工作流文件；P0-3 工作流文件改动触发两个作业（判定模拟 9/9 通过）；P1-1 README 删掉 `actions: write` 建议；P1-2 体积脚本只认 index.html 入口引用、边界测试 8/8 通过；P1-3 Node 20 实测通过（上）；P1-4 演示 PR 与截图已完成（PR #1，run 45473363943，见验收 1）。
 
 GPT 复核第二轮（2026-11-25 01:14，修改后 GO）：七项整改基本落实，抓出新 P0——Node 20 已停服，工作流必须迁到 Node 24；另 P1 一项——README 缓存权限说明错误。裁决全文见 `~/workspace/goals/20/files/GPT复核-3162交付-2026-11-25-第二轮.md`。本次迁移已按裁决做完三项必须完成 + 两项建议。
 
@@ -34,14 +34,14 @@ Node 24 下全套重验（本机 Node v24.22.1、pnpm 10.34.9，2026-11-25）：
 
 ## 验收 1：web 与 miniprogram 两个作业在 PR 上均通过（附截图）
 
-**本地状态：通过（Node 24 下重验通过）。PR 截图：待推后补，线上待验证（演示 PR 后补）。**
+**线上状态：通过。演示 PR #1（分支 demo/ac1-20261125，提交 6c146ab），CI 运行 45473363943 已完成，结论 success，总耗时 55 秒；三个作业全部成功：变更检测 12 秒、web（工作台）37 秒、miniprogram（小程序）16 秒；产物 web-dist 1 个，207 KB（212,075 字节），未过期。两作业均实际运行，证明 paths-filter 在真实 PR 文件列表上对 web 与 miniprogram 均返回 true；artifact 上传在 contents: read 下成功，未报 403，`actions: write` 不需要。截图已归档：`evidence/ci-run-45473363943-overview.pdf`（运行总览，1 页）与 `evidence/ci-run-45473363943-web-job.pdf`（web 作业详情，2 页；浏览器工具只提供页面存 PDF，未提供 PNG 直存，故为 PDF 存档）。**
 
 - 本地全量验证 `bash scripts/run-all.sh`，RESULT: PASS，输出原文见 `evidence/`：
 - `web-lint.log`、`web-typecheck.log`、`web-test.log`、`web-build.log`、`bundle-pass.log`
 - `mini-typecheck.log`、`mini-lint.log`、`appid-pass.log`
 - 工作流本身（`.github/workflows/frontend-ci.yml`）含 `changes` + `web` + `miniprogram` 三个作业；演示 PR 同时改 `web/**` 与 `miniprogram/**`，两个作业都会跑。
 - GPT 复核 P0 改动：`changes` 作业有 `pull-requests: read` 权限（paths-filter 在 PR 事件中调 GitHub REST API 取文件列表要用）；触发路径含 `scripts/**`；过滤映射：`scripts/check-bundle-size.mjs` → web、`scripts/check-appid.mjs` → miniprogram、工作流文件本身 → 两者。判定模拟 `node tests/paths-filter-simulation.mjs` 9/9 通过（只改工作流文件时两作业都跑；只改体积脚本只跑 web；只改 appid 脚本只跑 miniprogram），证据：`evidence/paths-filter-simulation.log`。模拟只覆盖“过滤规则 → 输出”的映射，不覆盖取 PR 文件列表那一步（须 GitHub 实测）。
-- PR 上的实际运行截图须推仓建 PR 后补，见“还剩什么”。
+- PR 上的实际运行已完成并归档，见本节线上状态。
 
 ## 验收 2：故意制造类型错误时 typecheck 步骤失败
 
@@ -71,6 +71,6 @@ Node 24 下全套重验（本机 Node v24.22.1、pnpm 10.34.9，2026-11-25）：
 
 ## 还剩什么
 
-1. 推仓到公开仓 `AWKN-Lab/clawhunt-3162-frontend-ci`（main 分支；本次 Node 24 迁移为第二批提交，正常推，不改历史、不 force-push），建演示 PR（同时改 `web/**` 与 `miniprogram/**`），等 CI 跑完后补两张成功运行截图（验收 1，P1-4）。GPT 第二轮裁决：三项必须完成做完后允许推送。
-2. PR 上若 `actions/upload-artifact` 报 403（见 README“已知的权限说明”），先记下实际错误原文再排查，不预先扩权；`actions: write` 不需要加（上传产物不用它）。
+1. 演示 PR 与截图已完成（PR #1，run 45473363943，AC1 线上通过；见验收 1）。演示 PR 本身暂不合并（仅两行注释触发用）；是否合并另行决定。
+2. `actions/upload-artifact` 在 PR 上实际上传成功（web-dist，207 KB），未报 403；`actions: write` 确认不需要加。
 3. 投标：投标价 $81.00 仍适用（范围与验收均未变）；投标本身须走平台提交流程，本次本地交付不含投标动作。
