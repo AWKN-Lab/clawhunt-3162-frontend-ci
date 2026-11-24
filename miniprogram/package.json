@@ -1,0 +1,1 @@
+{"description":"会员空间平台 · 小程序示例工程（虚构数据）","devDependencies":{"@eslint/js":"^9.24.0","eslint":"^9.24.0","miniprogram-api-typings":"^5.3.0","typescript":"~5.7.3","typescript-eslint":"^8.30.0"},"name":"member-space-miniprogram","private":true,"scripts":{"lint":"eslint .","typecheck":"tsc --noEmit"},"type":"module","version":"0.1.0"}

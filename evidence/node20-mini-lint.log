@@ -1,0 +1,12 @@
+
+> member-space-miniprogram@0.1.0 lint /home/hatch/workspace/goals/20/hidden_files/clawhunt-hourly-build/3162/node20-verify/miniprogram
+> eslint .
+
+
+/home/hatch/workspace/goals/20/hidden_files/clawhunt-hourly-build/3162/node20-verify/miniprogram/app.ts
+  4:5  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+
+✖ 1 problem (0 errors, 1 warning)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+
+mini lint exit=0

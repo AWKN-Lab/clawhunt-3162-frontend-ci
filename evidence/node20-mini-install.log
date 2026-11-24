@@ -1,0 +1,16 @@
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +110
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 110, reused 109, downloaded 0, added 0
+Progress: resolved 110, reused 110, downloaded 0, added 110, done
+
+devDependencies:
++ @eslint/js 9.39.5
++ eslint 9.39.5
++ miniprogram-api-typings 5.3.1
++ typescript 5.7.3
++ typescript-eslint 8.74.0
+
+Done in 2.8s using pnpm v10.34.9
+mini install exit=0

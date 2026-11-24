@@ -1,0 +1,5 @@
+
+> member-space-web@0.1.0 lint /home/hatch/workspace/goals/20/hidden_files/clawhunt-hourly-build/3162/node20-verify/web
+> eslint .
+
+web lint exit=0

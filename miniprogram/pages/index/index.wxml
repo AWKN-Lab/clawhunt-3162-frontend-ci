@@ -1,0 +1,7 @@
+<view class="container">
+  <text class="title">{{title}}</text>
+  <text class="platform">当前平台：{{platform}}</text>
+  <view wx:for="{{sites}}" wx:key="id" class="site">
+    <text>{{item.name}} · 会员 {{item.members}} 人</text>
+  </view>
+</view>

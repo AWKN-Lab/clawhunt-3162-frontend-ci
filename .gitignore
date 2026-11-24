@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.tmp-*/
+*.log
+.DS_Store
+
+# 验收证据日志是交付物的一部分，必须进仓
+!evidence/*.log

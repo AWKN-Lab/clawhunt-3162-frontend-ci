@@ -1,0 +1,4 @@
+$ node ../scripts/check-appid.mjs --config project.config.json
+appid：touristappid，占位值：touristappid
+APPID CHECK PASSED
+exit=0

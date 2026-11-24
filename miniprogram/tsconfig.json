@@ -1,0 +1,1 @@
+{"compilerOptions":{"forceConsistentCasingInFileNames":true,"lib":["ES2017"],"module":"commonjs","moduleResolution":"node","noEmit":true,"noUnusedLocals":true,"noUnusedParameters":true,"skipLibCheck":true,"strict":true,"target":"ES2017","types":["miniprogram-api-typings"]},"include":["app.ts","pages"]}
