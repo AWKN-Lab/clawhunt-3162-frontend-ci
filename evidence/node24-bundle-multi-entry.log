@@ -1,0 +1,33 @@
+chunk 体积（KB）：
+  assets/b.js  900.00
+  assets/a.js  100.00
+合计（JS+CSS，仅供参考；门禁只看入口 JS，不含静态依赖 chunk 与 CSS）：1000.00 KB
+入口（共 2 个，上限：800 KB）：
+  主包：assets/a.js  100.00 KB
+  主包：assets/b.js  900.00 KB
+BUNDLE CHECK FAILED: 主包 assets/b.js 实际 900.00 KB，超过上限 800 KB
+exit=1
+chunk 体积（KB）：
+  assets/sub/nested.js  100.00
+合计（JS+CSS，仅供参考；门禁只看入口 JS，不含静态依赖 chunk 与 CSS）：100.00 KB
+入口（共 1 个，上限：800 KB）：
+  主包：assets/sub/nested.js  100.00 KB
+BUNDLE CHECK PASSED
+exit=0
+chunk 体积（KB）：
+  assets/a.js  100.00
+  assets/b.js  100.00
+合计（JS+CSS，仅供参考；门禁只看入口 JS，不含静态依赖 chunk 与 CSS）：200.00 KB
+入口（共 2 个，上限：800 KB）：
+  主包：assets/a.js  100.00 KB
+  主包：assets/b.js  100.00 KB
+BUNDLE CHECK PASSED
+exit=0
+chunk 体积（KB）：
+  assets/vendor-big.js  900.00
+  assets/entry.js  100.00
+合计（JS+CSS，仅供参考；门禁只看入口 JS，不含静态依赖 chunk 与 CSS）：1000.00 KB
+入口（共 1 个，上限：800 KB）：
+  主包：assets/entry.js  100.00 KB
+BUNDLE CHECK PASSED
+exit=0

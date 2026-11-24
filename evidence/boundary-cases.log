@@ -12,23 +12,23 @@ $ node /home/hatch/workspace/goals/20/hidden_files/clawhunt-hourly-build/3162/cl
 exit=1
 OK: 体积边界：主包 819201 字节（最小超限） 如预期失败
 === appid 边界：缺失 ===
-$ node /home/hatch/workspace/goals/20/hidden_files/clawhunt-hourly-build/3162/clawhunt-3162-frontend-ci/scripts/check-appid.mjs --config /tmp/tmp.WJjKtkSCdx/missing.json
+$ node /home/hatch/workspace/goals/20/hidden_files/clawhunt-hourly-build/3162/clawhunt-3162-frontend-ci/scripts/check-appid.mjs --config /tmp/tmp.qo76G76htd/missing.json
 exit=1
 OK: appid 边界：缺失 如预期失败
 === appid 边界：为空 ===
-$ node /home/hatch/workspace/goals/20/hidden_files/clawhunt-hourly-build/3162/clawhunt-3162-frontend-ci/scripts/check-appid.mjs --config /tmp/tmp.WJjKtkSCdx/empty.json
+$ node /home/hatch/workspace/goals/20/hidden_files/clawhunt-hourly-build/3162/clawhunt-3162-frontend-ci/scripts/check-appid.mjs --config /tmp/tmp.qo76G76htd/empty.json
 exit=1
 OK: appid 边界：为空 如预期失败
 === appid 边界：null ===
-$ node /home/hatch/workspace/goals/20/hidden_files/clawhunt-hourly-build/3162/clawhunt-3162-frontend-ci/scripts/check-appid.mjs --config /tmp/tmp.WJjKtkSCdx/null.json
+$ node /home/hatch/workspace/goals/20/hidden_files/clawhunt-hourly-build/3162/clawhunt-3162-frontend-ci/scripts/check-appid.mjs --config /tmp/tmp.qo76G76htd/null.json
 exit=1
 OK: appid 边界：null 如预期失败
 === appid 边界：非占位值 ===
-$ node /home/hatch/workspace/goals/20/hidden_files/clawhunt-hourly-build/3162/clawhunt-3162-frontend-ci/scripts/check-appid.mjs --config /tmp/tmp.WJjKtkSCdx/other.json
+$ node /home/hatch/workspace/goals/20/hidden_files/clawhunt-hourly-build/3162/clawhunt-3162-frontend-ci/scripts/check-appid.mjs --config /tmp/tmp.qo76G76htd/other.json
 exit=1
 OK: appid 边界：非占位值 如预期失败
 === appid 边界：占位值 ===
-$ node /home/hatch/workspace/goals/20/hidden_files/clawhunt-hourly-build/3162/clawhunt-3162-frontend-ci/scripts/check-appid.mjs --config /tmp/tmp.WJjKtkSCdx/ok.json
+$ node /home/hatch/workspace/goals/20/hidden_files/clawhunt-hourly-build/3162/clawhunt-3162-frontend-ci/scripts/check-appid.mjs --config /tmp/tmp.qo76G76htd/ok.json
 exit=0
 OK: appid 边界：占位值 如预期通过
 RESULT: PASS（边界用例 8/8 均按预期表现）

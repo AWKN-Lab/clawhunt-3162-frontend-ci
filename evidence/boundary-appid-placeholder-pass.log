@@ -1,4 +1,4 @@
-$ node /home/hatch/workspace/goals/20/hidden_files/clawhunt-hourly-build/3162/clawhunt-3162-frontend-ci/scripts/check-appid.mjs --config /tmp/tmp.87dmFXc5U6/ok.json
+$ node /home/hatch/workspace/goals/20/hidden_files/clawhunt-hourly-build/3162/clawhunt-3162-frontend-ci/scripts/check-appid.mjs --config /tmp/tmp.qo76G76htd/ok.json
 appid：touristappid，占位值：touristappid
 APPID CHECK PASSED
 exit=0

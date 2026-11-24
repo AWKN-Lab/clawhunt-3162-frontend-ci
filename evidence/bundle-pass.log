@@ -2,7 +2,8 @@ $ node ../scripts/check-bundle-size.mjs --dist dist
 chunk 体积（KB）：
   assets/index-DTEK62BL.js  619.02
   assets/index-BNGNov8b.css  171.00
-合计（JS+CSS，仅供参考；门禁只看主包 JS）：790.02 KB
-主包：assets/index-DTEK62BL.js  619.02 KB，上限：800 KB
+合计（JS+CSS，仅供参考；门禁只看入口 JS，不含静态依赖 chunk 与 CSS）：790.02 KB
+入口（共 1 个，上限：800 KB）：
+  主包：assets/index-DTEK62BL.js  619.02 KB
 BUNDLE CHECK PASSED
 exit=0

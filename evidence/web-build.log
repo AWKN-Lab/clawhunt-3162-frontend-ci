@@ -16,5 +16,5 @@ dist/assets/index-DTEK62BL.js   633.88 kB │ gzip: 192.75 kB
 - Using dynamic import() to code-split the application
 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
-✓ built in 39.53s
+✓ built in 41.91s
 exit=0

@@ -1,0 +1,43 @@
+filters 定义（读自 .github/workflows/frontend-ci.yml）：
+  web: web/**, scripts/check-bundle-size.mjs, .github/workflows/frontend-ci.yml
+  miniprogram: miniprogram/**, scripts/check-appid.mjs, .github/workflows/frontend-ci.yml
+
+用例：只改工作流文件
+  改动：.github/workflows/frontend-ci.yml
+  预期：web=true miniprogram=true
+  实际：web=true miniprogram=true  OK
+用例：只改体积检查脚本
+  改动：scripts/check-bundle-size.mjs
+  预期：web=true miniprogram=false
+  实际：web=true miniprogram=false  OK
+用例：只改 appid 检查脚本
+  改动：scripts/check-appid.mjs
+  预期：web=false miniprogram=true
+  实际：web=false miniprogram=true  OK
+用例：只改 web 源码
+  改动：web/src/App.tsx
+  预期：web=true miniprogram=false
+  实际：web=true miniprogram=false  OK
+用例：只改小程序源码
+  改动：miniprogram/app.ts
+  预期：web=false miniprogram=true
+  实际：web=false miniprogram=true  OK
+用例：只改 README（不触发工作流，不进过滤）
+  改动：README.md
+  预期：web=false miniprogram=false
+  实际：web=false miniprogram=false  OK
+用例：只改其他脚本（run-all.sh 未映射）
+  改动：scripts/run-all.sh
+  预期：web=false miniprogram=false
+  实际：web=false miniprogram=false  OK
+用例：演示 PR：同时改 web 与 miniprogram
+  改动：web/src/App.tsx, miniprogram/app.ts
+  预期：web=true miniprogram=true
+  实际：web=true miniprogram=true  OK
+用例：同时改两个检查脚本
+  改动：scripts/check-bundle-size.mjs, scripts/check-appid.mjs
+  预期：web=true miniprogram=true
+  实际：web=true miniprogram=true  OK
+
+RESULT: PASS（9/9 个用例均符合预期）
+exit=0

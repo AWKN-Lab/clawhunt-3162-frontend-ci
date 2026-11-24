@@ -1,7 +1,8 @@
 $ node /home/hatch/workspace/goals/20/hidden_files/clawhunt-hourly-build/3162/clawhunt-3162-frontend-ci/scripts/check-bundle-size.mjs --dist dist
 chunk 体积（KB）：
   assets/index-test.js  800.00
-合计（JS+CSS，仅供参考；门禁只看主包 JS）：800.00 KB
-主包：assets/index-test.js  800.00 KB，上限：800 KB
+合计（JS+CSS，仅供参考；门禁只看入口 JS，不含静态依赖 chunk 与 CSS）：800.00 KB
+入口（共 1 个，上限：800 KB）：
+  主包：assets/index-test.js  800.00 KB
 BUNDLE CHECK FAILED: 主包 assets/index-test.js 实际 800.00 KB，超过上限 800 KB
 exit=1

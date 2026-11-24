@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 /**
  * 体积门禁：读取 Vite 构建产物，打印各 chunk 体积；
- * 主包（index.html 引用的入口 chunk）超过 BUNDLE_MAX_KB（默认 800）时失败。
+ * 入口 JS（index.html 引用的全部 src="...js"）超过 BUNDLE_MAX_KB（默认 800）时失败。
+ * 门禁口径：只检查入口 JS，不含静态依赖 chunk 与 CSS；JS+CSS 合计仅供参考。
+ * assets/ 目录递归扫描（嵌套子目录的 JS 也计入清单）；index.html 里有多个
+ * 入口时全部都要过门禁，漏掉任何一个都算漏检。
  * 只打印文件体积，不打印任何环境变量。
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
@@ -27,29 +30,39 @@ if (!Number.isFinite(limitKb) || limitKb <= 0) {
   fail(`BUNDLE_MAX_KB 无效：${process.env.BUNDLE_MAX_KB}`);
 }
 
-const assetsDir = join(distDir, 'assets');
-const files = existsSync(assetsDir)
-  ? readdirSync(assetsDir).map((f) => join('assets', f))
-  : [];
+// 递归扫描 assets/，收齐全部 .js 与 .css（嵌套子目录也计入清单）。
 const entries = [];
-for (const rel of files) {
-  const full = join(distDir, rel);
-  if (!statSync(full).isFile()) continue;
-  if (!/\.(js|css)$/.test(rel)) continue;
-  entries.push({ file: rel, kb: statSync(full).size / 1024 });
+function walk(dir, relBase) {
+  for (const name of readdirSync(dir)) {
+    const full = join(dir, name);
+    const rel = relBase ? `${relBase}/${name}` : name;
+    if (statSync(full).isDirectory()) {
+      walk(full, rel);
+    } else if (/\.(js|css)$/.test(name)) {
+      entries.push({ file: rel, kb: statSync(full).size / 1024 });
+    }
+  }
 }
+const assetsDir = join(distDir, 'assets');
+if (existsSync(assetsDir)) walk(assetsDir, 'assets');
 entries.sort((a, b) => b.kb - a.kb);
 
-// 主包 = index.html 引用的入口 js；找不到引用时直接失败，
+// 入口 = index.html 引用的全部 src="...js"；一个都没有时直接失败，
 // 不退化为“最大的 js chunk”（最大 chunk 未必是入口，会把门禁判错）。
-let mainFile = null;
+let mainFiles = [];
 const indexHtml = join(distDir, 'index.html');
 if (existsSync(indexHtml)) {
   const html = readFileSync(indexHtml, 'utf-8');
-  const m = html.match(/src="([^"]+\.js)"/);
-  if (m) mainFile = m[1].replace(/^\//, '');
+  const seen = new Set();
+  for (const m of html.matchAll(/src="([^"]+\.js)"/g)) {
+    const f = m[1].replace(/^\//, '');
+    if (!seen.has(f)) {
+      seen.add(f);
+      mainFiles.push(f);
+    }
+  }
 }
-if (!mainFile) {
+if (mainFiles.length === 0) {
   fail('index.html 中没有找到入口 js 引用（src="...js"），无法确定主包');
 }
 
@@ -58,14 +71,23 @@ console.log('chunk 体积（KB）：');
 for (const e of entries) {
   console.log(`  ${e.file}  ${e.kb.toFixed(2)}`);
 }
-console.log(`合计（JS+CSS，仅供参考；门禁只看主包 JS）：${totalKb.toFixed(2)} KB`);
+console.log(`合计（JS+CSS，仅供参考；门禁只看入口 JS，不含静态依赖 chunk 与 CSS）：${totalKb.toFixed(2)} KB`);
 
-const main = entries.find((e) => e.file === mainFile);
-if (!main) {
-  fail(`入口 chunk 未在产物中找到：${mainFile}`);
+const mains = [];
+for (const f of mainFiles) {
+  const found = entries.find((e) => e.file === f);
+  if (!found) {
+    fail(`入口 chunk 未在产物中找到：${f}`);
+  }
+  mains.push(found);
 }
-console.log(`主包：${main.file}  ${main.kb.toFixed(2)} KB，上限：${limitKb} KB`);
-if (main.kb > limitKb) {
-  fail(`主包 ${main.file} 实际 ${main.kb.toFixed(2)} KB，超过上限 ${limitKb} KB`);
+console.log(`入口（共 ${mains.length} 个，上限：${limitKb} KB）：`);
+for (const m of mains) {
+  console.log(`  主包：${m.file}  ${m.kb.toFixed(2)} KB`);
+}
+for (const m of mains) {
+  if (m.kb > limitKb) {
+    fail(`主包 ${m.file} 实际 ${m.kb.toFixed(2)} KB，超过上限 ${limitKb} KB`);
+  }
 }
 console.log('BUNDLE CHECK PASSED');

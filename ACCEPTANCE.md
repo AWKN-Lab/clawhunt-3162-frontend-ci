@@ -3,13 +3,38 @@
 单子：GitHub Actions 前端 CI：工作台构建与小程序 TypeScript 编译。
 截止：2026-11-30。投标价：$81.00（90%）。
 
-本地验证环境：Node v24.22.1、pnpm 10.34.9（CI 用 Node 20，见工作流）。Node 20 已在本机实测通过：Node v20.20.2（最新 20.x LTS，官网下载、SHA256 对官方清单核对无误），web 与 miniprogram 全套步骤 10/10 通过（安装、lint、typecheck、test 3/3、build 54.71s、体积门禁主包 619.02 KB、appid 检查），日志见 `evidence/node20-*.log`。
+本地验证环境：Node v24.22.1、pnpm 10.34.9；CI 用 Node 24（见工作流）。Node 20 已于 2026-04-30 EOL，GitHub Actions 已于 2026-09-23 移除 Node 20 运行时，本仓已迁移至 Node 24（见下“Node 24 迁移记录”）；Node 20 的本地测试日志保留在 `evidence/node20-*.log`，作历史兼容证据（当时 web 与 miniprogram 全套步骤 10/10 通过，build 54.71s、主包 619.02 KB）。
 
 GPT 复核（2026-11-25，修改后 GO）已按七点改完：P0-1 changes 作业补 `pull-requests: read`；P0-2 触发路径加 `scripts/**`、过滤映射补两个检查脚本与工作流文件；P0-3 工作流文件改动触发两个作业（判定模拟 9/9 通过）；P1-1 README 删掉 `actions: write` 建议；P1-2 体积脚本只认 index.html 入口引用、边界测试 8/8 通过；P1-3 Node 20 实测通过（上）；P1-4 演示 PR 与截图待推仓后做（见“还剩什么”）。
 
+GPT 复核第二轮（2026-11-25 01:14，修改后 GO）：七项整改基本落实，抓出新 P0——Node 20 已停服，工作流必须迁到 Node 24；另 P1 一项——README 缓存权限说明错误。裁决全文见 `~/workspace/goals/20/files/GPT复核-3162交付-2026-11-25-第二轮.md`。本次迁移已按裁决做完三项必须完成 + 两项建议。
+
+## Node 24 迁移记录（2026-11-25）
+
+- 工作流两个作业的 node-version 由 '20' 改为 '24'；第三方 Action 全部升级到声明 node24 运行时的版本，并重新固定到完整 commit SHA（每个版本均用 gh api 实查：读该版本 action.yml 的 runs.using 确认为 node24）。
+
+| Action | 新版本 | 固定 SHA |
+| --- | --- | --- |
+| actions/checkout | v7.0.1 | 3d3c42e5aac5ba805825da76410c181273ba90b1 |
+| actions/setup-node | v7.1.0 | 949feb2413d6458794dcd2491c4babbbce0c15c1 |
+| actions/upload-artifact | v7.0.2 | cf430e030ddbb5b0abf93d22962f4752f3646cd9 |
+| pnpm/action-setup | v6.1.1 | 73e46992e05b19abd31f2f3c20e0e7370d762115 |
+| dorny/paths-filter | v4.0.3 | ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d |
+
+- README 缓存说明按 GPT 改法重写：Actions Cache 使用独立缓存权限，缓存写入受限时可能出现保存警告，不影响构建步骤；无需因此增加 GITHUB_TOKEN 的 `actions: write` 权限。删掉原来“pnpm 缓存保存同样需要写权限”的错误说法。
+- `scripts/check-bundle-size.mjs` 增加多入口检测（取 index.html 里全部 `src="...js"`，不再只取第一个）与 assets/ 递归扫描；门禁口径写清：只检查入口 JS，不含静态依赖 chunk 与 CSS。
+- `tests/boundary-cases.sh` 的失败用例除退出码非零外，再验脚本自身的失败标记（CHECK FAILED），避免脚本自身异常被误判为门禁通过。
+
+Node 24 下全套重验（本机 Node v24.22.1、pnpm 10.34.9，2026-11-25）：
+
+- `scripts/run-all.sh`：RESULT: PASS——web 安装、lint、typecheck、test 3/3、build（41.91s）、体积门禁主包 619.02 KB；miniprogram 安装、typecheck、lint、appid 检查；边界测试 8/8；路径过滤判定模拟 9/9。
+- `tests/negative-cases.sh`：RESULT: PASS——AC2 追加错误类型报 error TS2322（exit 2）；AC3 上限压到 1KB 报“超过上限 1 KB”并打印实际体积（exit 1）；AC4 appid 改虚构值报“不是占位值”（exit 1）。
+- 多入口与嵌套扫描专项（`evidence/node24-bundle-multi-entry.log`）：双入口其一超限时失败并点名超限入口；入口在 assets/sub/ 嵌套目录时递归扫描找到并通过；双入口均在限内通过；非入口大 chunk（900KB 静态依赖）超限时门禁仍通过（只看入口 JS）。
+- 新日志全部以 node24- 前缀存进 `evidence/`（25 份），与 node20-*.log（11 份）并存，未覆盖、未删除。
+
 ## 验收 1：web 与 miniprogram 两个作业在 PR 上均通过（附截图）
 
-**本地状态：通过。PR 截图：待推后补。**
+**本地状态：通过（Node 24 下重验通过）。PR 截图：待推后补，线上待验证（演示 PR 后补）。**
 
 - 本地全量验证 `bash scripts/run-all.sh`，RESULT: PASS，输出原文见 `evidence/`：
 - `web-lint.log`、`web-typecheck.log`、`web-test.log`、`web-build.log`、`bundle-pass.log`
@@ -32,7 +57,7 @@ GPT 复核（2026-11-25，修改后 GO）已按七点改完：P0-1 changes 作�
 - 反向用例（AC3 一节）：先正常构建，再 `BUNDLE_MAX_KB=1 node scripts/check-bundle-size.mjs --dist web/dist`。
 - 证据：`evidence/ac3-bundle-over-limit.log`——打印全部 chunk 体积与主包实际 KB，报 `超过上限 1 KB`，退出码非 0。
 - 通过侧：`evidence/bundle-pass.log`——默认上限 800 KB 时通过并打印同样明细。
-- 主包识别：`scripts/check-bundle-size.mjs` 沿 `web/dist/index.html` 的入口引用（`src="...js"`）确定入口 JS；找不到引用时直接失败，不退化为“最大的 js chunk”；门禁只看主包 JS，JS+CSS 合计仅供参考。
+- 主包识别：`scripts/check-bundle-size.mjs` 沿 `web/dist/index.html` 的入口引用（`src="...js"`）确定入口 JS；找不到引用时直接失败，不退化为“最大的 js chunk”；门禁只看入口 JS（限定入口 JS：index.html 引用的全部入口都要过门禁，静态依赖 chunk 与 CSS 不计入），JS+CSS 合计仅供参考；assets/ 递归扫描，嵌套子目录的 JS 也计入清单。
 - 边界测试 `bash tests/boundary-cases.sh` 8/8 通过：主包恰好 800 KB（819200 字节）通过、约 800.01 KB（819210 字节）失败、819201 字节（最小超限）失败；appid 缺失、为空、null、非占位值均失败、占位值通过。证据：`evidence/boundary-bundle-*.log`、`evidence/boundary-appid-*.log`、`evidence/boundary-cases.log`。
 
 ## 验收 4：把 appid 改成非占位值时 miniprogram 作业失败
@@ -46,6 +71,6 @@ GPT 复核（2026-11-25，修改后 GO）已按七点改完：P0-1 changes 作�
 
 ## 还剩什么
 
-1. 推仓到公开仓 `AWKN-Lab/clawhunt-3162-frontend-ci`（main 分支），建演示 PR（同时改 `web/**` 与 `miniprogram/**`），等 CI 跑完后补两张成功运行截图（验收 1，P1-4）。推仓前须再送 GPT 复核一轮，并附上 `scripts/check-bundle-size.mjs` 与 `scripts/check-appid.mjs` 两份源码（上一轮只附了日志没附源码）。
+1. 推仓到公开仓 `AWKN-Lab/clawhunt-3162-frontend-ci`（main 分支；本次 Node 24 迁移为第二批提交，正常推，不改历史、不 force-push），建演示 PR（同时改 `web/**` 与 `miniprogram/**`），等 CI 跑完后补两张成功运行截图（验收 1，P1-4）。GPT 第二轮裁决：三项必须完成做完后允许推送。
 2. PR 上若 `actions/upload-artifact` 报 403（见 README“已知的权限说明”），先记下实际错误原文再排查，不预先扩权；`actions: write` 不需要加（上传产物不用它）。
 3. 投标：投标价 $81.00 仍适用（范围与验收均未变）；投标本身须走平台提交流程，本次本地交付不含投标动作。

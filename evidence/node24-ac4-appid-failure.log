@@ -1,0 +1,4 @@
+$ node /home/hatch/workspace/goals/20/hidden_files/clawhunt-hourly-build/3162/clawhunt-3162-frontend-ci/scripts/check-appid.mjs --config /tmp/tmp.qdKkJObVM9/project.config.json
+appid：wx1234567890abcdef，占位值：touristappid
+APPID CHECK FAILED: appid 不是占位值（当前：wx1234567890abcdef，应为：touristappid）；真实 appid 只在发布流程注入
+exit=1

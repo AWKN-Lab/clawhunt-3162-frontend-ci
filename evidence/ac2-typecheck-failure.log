@@ -1,6 +1,6 @@
 $ pnpm typecheck
 
-> member-space-web@0.1.0 typecheck /tmp/tmp.8cEr3XQ2AC
+> member-space-web@0.1.0 typecheck /tmp/tmp.nwiwzhYRaP
 > tsc --noEmit
 
 src/App.tsx(50,7): error TS2322: Type 'string' is not assignable to type 'number'.

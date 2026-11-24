@@ -6,11 +6,11 @@ $ pnpm test --run
 
  RUN  v3.2.7 /home/hatch/workspace/goals/20/hidden_files/clawhunt-hourly-build/3162/clawhunt-3162-frontend-ci/web
 
- ✓ src/App.test.tsx (3 tests) 278ms
+ ✓ src/App.test.tsx (3 tests) 109ms
 
  Test Files  1 passed (1)
       Tests  3 passed (3)
-   Start at  01:02:47
-   Duration  21.23s (transform 7.87s, setup 0ms, collect 18.35s, tests 278ms, environment 1.47s, prepare 202ms)
+   Start at  17:18:07
+   Duration  22.71s (transform 7.90s, setup 0ms, collect 19.95s, tests 109ms, environment 1.51s, prepare 212ms)
 
 exit=0

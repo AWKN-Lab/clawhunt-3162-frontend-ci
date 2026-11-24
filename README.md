@@ -23,7 +23,7 @@
 - 触发：PR 修改 `web/**`、`miniprogram/**`、`scripts/**` 或本工作流文件时运行。
 - `changes` 作业用 `dorny/paths-filter` 判定改了哪边；`web` 与 `miniprogram` 各自只在对应路径被改时跑。`changes` 作业有 `pull-requests: read` 权限（paths-filter 在 PR 事件中调 GitHub REST API 取文件列表要用）；`web` 与 `miniprogram` 保持 `contents: read`。
 - 过滤映射：`scripts/check-bundle-size.mjs` 触发 web、`scripts/check-appid.mjs` 触发 miniprogram、工作流文件本身触发两者；只改工作流文件时两个作业都会跑（本地判定模拟见 `tests/paths-filter-simulation.mjs`，`evidence/paths-filter-simulation.log`）。
-- `web` 作业：Node 20，pnpm 按 lockfile 安装并缓存，依次跑 lint（ESLint）、typecheck（`tsc --noEmit`）、test（Vitest）、build（Vite）；构建后统计各 chunk 体积，主包超过 `BUNDLE_MAX_KB`（默认 800）时失败；`dist/` 作为 artifact 保留 7 天。
+- `web` 作业：Node 24，pnpm 按 lockfile 安装并缓存，依次跑 lint（ESLint）、typecheck（`tsc --noEmit`）、test（Vitest）、build（Vite）；构建后统计各 chunk 体积，入口 JS 超过 `BUNDLE_MAX_KB`（默认 800）时失败；`dist/` 作为 artifact 保留 7 天。体积门禁口径：只检查入口 JS，不含静态依赖 chunk 与 CSS。
 - `miniprogram` 作业：跑 `tsc --noEmit` 与 ESLint，并检查 `project.config.json` 的 appid 为占位值。
 - 两个作业都不在日志中打印环境变量；工作流顶层权限只给 `contents: read`，`changes` 作业另加 `pull-requests: read`（见上）；第三方 action 全部固定到提交 SHA；同分支新提交取消旧运行（`concurrency` + `cancel-in-progress`）。
 
@@ -49,7 +49,7 @@ cd web && pnpm install && pnpm lint && pnpm typecheck && pnpm test --run && pnpm
 cd miniprogram && pnpm install && pnpm typecheck && pnpm lint
 ```
 
-本地验证环境：Node v24.22.1、pnpm 10.34.9；CI 用 Node 20（见工作流）。Node 20 已在本机实测通过：Node v20.20.2（最新 20.x LTS，官网下载、SHA256 对官方清单核对无误），web 与 miniprogram 全套步骤 10/10 通过（安装、lint、typecheck、test 3/3、build、体积门禁、appid 检查），日志见 `evidence/node20-*.log`。
+本地验证环境：Node v24.22.1、pnpm 10.34.9；CI 用 Node 24（见工作流）。Node 20 已于 2026-04-30 EOL，GitHub Actions 已于 2026-09-23 移除 Node 20 运行时，本仓已迁移至 Node 24；Node 20 的本地测试日志保留在 `evidence/node20-*.log`，作历史兼容证据。
 
 本机注意：工作区目录组原为 `nogroup`（65534），pnpm 写文件时会 chown 到父目录属主（0:65534），而本机 overlayfs 拒绝 chown 到 gid 65534，导致安装报 EPERM。已对本交付树执行 `chgrp -R 0` 解决；CI（GitHub runner）不受影响。
 
@@ -59,7 +59,7 @@ cd miniprogram && pnpm install && pnpm typecheck && pnpm lint
 
 - 改工作流默认值：编辑 `.github/workflows/frontend-ci.yml` 里 `web` 作业的 `env.BUNDLE_MAX_KB`。
 - 本地单次覆盖：`BUNDLE_MAX_KB=500 bash scripts/run-all.sh`，或 `BUNDLE_MAX_KB=1 node scripts/check-bundle-size.mjs --dist web/dist`。
-- 主包指 `web/dist/index.html` 引用的入口 chunk；脚本每次都会打印全部 chunk 体积与合计。
+- 主包指 `web/dist/index.html` 引用的入口 chunk（有多个入口时全部都要过门禁）；脚本每次都会打印全部 chunk 体积与合计。门禁只检查入口 JS，不含静态依赖 chunk 与 CSS；合计仅供参考。
 
 ## appid 占位值
 
@@ -70,7 +70,7 @@ cd miniprogram && pnpm install && pnpm typecheck && pnpm lint
 工作流顶层权限只给 `contents: read`（按本单要求）；`changes` 作业另加 `pull-requests: read`（见上）。以下两点如在 PR 运行中出现需留意：
 
 - `actions/upload-artifact@v4` 上传 `dist/` 不需要 `actions: write`（`actions: write` 是管理 Actions 用的，如取消运行）。保持 `contents: read` 即可。首次 PR 实测上传步骤：若上传步骤报 403，先把实际错误原文记下来再排查（可能是 token 权限、artifact 名称或路径问题），不预先扩权。
-- `actions/setup-node` 的 pnpm 缓存保存同样需要写权限；保存失败时只报警告，不会导致作业失败。
+- Actions Cache 使用独立缓存权限。缓存写入受限时可能出现保存警告，不影响构建步骤；无需因此增加 GITHUB_TOKEN 的 `actions: write` 权限。
 
 ## 数据与保密
 

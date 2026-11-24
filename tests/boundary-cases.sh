@@ -29,6 +29,9 @@ expect_pass() {
 
 expect_fail() {
   # $1 用例名 $2 日志名 $3 期望关键字；其余参数为命令
+  # 失败必须同时满足三点：退出码非 0、出现期望关键字、出现脚本自身的
+  # 失败标记（BUNDLE/APPID CHECK FAILED）。只看退出码会把脚本自身异常
+  #（如模块加载失败、路径错误）误判为门禁通过，故多验一层错误类型。
   local name="$1"; local log="$2"; local want="$3"; shift 3
   echo "=== $name ==="
   echo "\$ $*" | tee "$EVIDENCE/$log"
@@ -40,6 +43,9 @@ expect_fail() {
   fi
   if ! grep -q -- "$want" "$EVIDENCE/$log"; then
     echo "UNEXPECTED OUTPUT: $name 未出现期望关键字 [$want]"; fail=1; return
+  fi
+  if ! grep -q -- "CHECK FAILED" "$EVIDENCE/$log"; then
+    echo "UNEXPECTED ERROR TYPE: $name 失败了但不是检查脚本的门禁失败（缺少 CHECK FAILED 标记，可能是脚本自身异常）"; fail=1; return
   fi
   echo "OK: $name 如预期失败"
 }
